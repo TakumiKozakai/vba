@@ -1,0 +1,75 @@
+Sub CSV作成()
+
+    Dim reg, data, fileName As String
+    Dim rSelection As Object
+    Dim r, v
+    Dim dr As Integer
+
+    ' 正規表現用
+    Set reg = CreateObject("VBScript.RegExp")
+
+    ' ファイル作成オブジェクト定義
+    Dim st As Obejct
+    Set st = CreateObject("ADODB.stream")
+
+    st.Open
+    st.Type = 2 ' adTypeText
+    st.charset = "UTF-8"
+
+    ' 選択範囲
+    Set rSelection = rSelection
+    ' 初期行数
+    dr = Selection.Row
+    ' 書き込みデータ初期化
+    data = ""
+
+    ' 選択セル範囲を1セルずつループ
+    For Each r In rSelection
+        ' 表示データを出力する
+        v = r.Text
+
+        If dr <> r.Row Then
+            ' 末尾カンマを削除
+            data = Left(data, Len(data) - 1)
+            ' 改行コードLF追加
+            data = data & vbLf
+            ' 次の行へ
+            dr = r.Row
+        End If
+
+        ' ダブルクォーテーション追加
+        reg.Pattern = "^"
+        v = reg.Replace(v, """")
+        reg.Pattern = "$"
+        v = reg.Replace(v, """")
+
+        ' データ連結
+        data = data & v & ","
+    Next
+
+    ' 末尾カンマを削除
+    data = Left(data, Len(data) - 1)
+    ' 改行コードLF追加
+    data = data & vbLf
+
+    ' 引数dataで指定した文字列を書き込む
+    st.WriteText data, 0
+
+    ' ファイルパスの定義（CSV形式）
+    fileName = Application.GetSaveAsFilename(, "CSVファイル(*.csv),*.csv")
+
+    With st
+        .Position = 0           ' 位置を先頭に設定
+        .Type = 1               ' バイナリ形式に変更
+        .Position = 3           ' 位置を3バイト分移動
+        myBuf = .Read           ' 内容を取得
+        .Position = 0           ' 位置を先頭に設定
+        .Write myBuf            ' 内容を書き込む
+        .SetEOS                 ' 位置を末尾に設定
+        .SaveToFile fileName, 2 ' ファイルに保存
+        .Close                  ' Streamを閉じる
+    End With
+
+    Set st = Nothing
+
+End Sub
