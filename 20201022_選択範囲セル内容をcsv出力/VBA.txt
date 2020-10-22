@@ -9,7 +9,7 @@ Sub CSV作成()
     Set reg = CreateObject("VBScript.RegExp")
 
     ' ファイル作成オブジェクト定義
-    Dim st As Obejct
+    Dim st As Object
     Set st = CreateObject("ADODB.stream")
 
     st.Open
@@ -17,7 +17,7 @@ Sub CSV作成()
     st.charset = "UTF-8"
 
     ' 選択範囲
-    Set rSelection = rSelection
+    Set rSelection = Selection
     ' 初期行数
     dr = Selection.Row
     ' 書き込みデータ初期化
